@@ -25,12 +25,39 @@ FASTQC_PATH = shutil.which("fastqc")
 MULTIQC_PATH = shutil.which("multiqc")
 QIIME2_PATH = shutil.which("qiime")
 
+LOGGING_DATEFMT = "%Y-%m-%d %H:%M:%S"
 VERBOSITY = 30
+
+
+class CustomFormatter(logging.Formatter):
+    grey = "\033[90m"  # ]
+    white = "\033[37m"  # ]
+    yellow = "\033[33m"  # ]
+    red = "\033[31m"  # ]
+    bold_red = "\033[31m\033[1m"  # ]]
+    reset = "\033[0m"  # ]
+    format_str = "{}[%(asctime)s] [%(levelname)s] %(message)s{}"
+
+    FORMATS = {
+        logging.DEBUG: format_str.format(grey, reset),
+        logging.INFO: format_str.format(white, reset),
+        logging.WARNING: format_str.format(yellow, reset),
+        logging.ERROR: format_str.format(red, reset),
+        logging.CRITICAL: format_str.format(bold_red, reset),
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt, datefmt=LOGGING_DATEFMT)
+        return formatter.format(record)
 
 
 # Function to setup the logger. Generated using ChatGPT, because boilerplate
 # Edited by me to add some more functionality like checking if passed log_file
-# path exists, passing in loggin-level and type hints..
+# path exists, passing in loggin-level and type hints.
+# Custom formatter was taken from:
+# https://stackoverflow.com/questions/384076/how-can-i-color-python-logging-output
+# and modified for this use case.
 def setup_logger(log_filepath: str, logging_level: int = VERBOSITY):
     # Create a custom logger
     logger = logging.getLogger(__name__)
@@ -52,11 +79,12 @@ def setup_logger(log_filepath: str, logging_level: int = VERBOSITY):
     file_handler.setLevel(logging_level)
 
     # Create formatter and add it to the handlers
-    formatter = logging.Formatter(
-        "[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+    colored_formatter = CustomFormatter()
+    plain_formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(message)s", datefmt=LOGGING_DATEFMT
     )
-    console_handler.setFormatter(formatter)
-    file_handler.setFormatter(formatter)
+    console_handler.setFormatter(colored_formatter)
+    file_handler.setFormatter(plain_formatter)
 
     # Add the handlers to the logger
     logger.addHandler(console_handler)
@@ -313,7 +341,7 @@ def euglenins() -> int:
     if args.log_filepath:
         log_filepath = args.log_filepath
     else:
-        log_filepath = f"{__file__}_{args.command}_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+        log_filepath = f"./{SCRIPT_NAME.strip('.py')}_{args.command}_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.log"
 
     logger = setup_logger(log_filepath, logging_level=VERBOSITY)
 

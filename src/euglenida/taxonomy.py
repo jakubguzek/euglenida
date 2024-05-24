@@ -140,7 +140,7 @@ def qiime_phylogeny_midpoint_root(
 
 
 def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
-    if args.verbose:
+    if args.verbose or args.debug: 
         utils.print_args(args, script_name=script_name)
 
     if args.qiime_path is None:
@@ -208,7 +208,7 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     if args.metadata is not None:
         metadata = pathlib.Path(args.metadata)
         logger.debug("Checking if passed in metadata file exists.")
-        if not metadata.exists() and args.verbose:
+        if not metadata.exists() and (args.verbose or args.debug):
             print(
                 f"\033[31m\033[1m{script_name}: error:\033[0m: {table_path}: No such file or directory!"  # ]]]
             )
@@ -232,7 +232,7 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
 
 
 def rooted_tree(args: argparse.Namespace, logger: Logger, script_name: str):
-    if args.verbose:
+    if args.verbose or args.debug:
         utils.print_args(args, script_name=script_name)
 
     if args.qiime_path is None:

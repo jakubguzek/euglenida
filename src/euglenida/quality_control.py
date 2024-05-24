@@ -6,7 +6,7 @@ from euglenida import utils
 
 
 def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> int:
-    if args.verbose:
+    if args.verbose or args.debug:
         utils.print_args(args, script_name=script_name)
 
     # Validate input file paths
@@ -64,4 +64,5 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
     logger.info(f"Running command: {utils.command_to_str(multiqc_command)}")
     utils.run_command_with_output(multiqc_command, args, script_name, logger)
 
+    logger.info("Qulity control script finished succesfully")
     return 0

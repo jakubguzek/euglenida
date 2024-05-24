@@ -138,7 +138,7 @@ def qiime_tools_export(
 
 
 def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
-    if args.verbose:
+    if args.verbose or args.debug:
         utils.print_args(args, script_name=script_name)
 
     if args.qiime_path is None:

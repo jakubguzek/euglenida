@@ -1,6 +1,6 @@
 import argparse
-import os
-import subprocess
+import os 
+import subprocess 
 import pathlib
 from logging import Logger
 from typing import Any, List
@@ -30,12 +30,14 @@ def run_command_with_output(
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT
     )
     try:
-        for c in iter(lambda: process.stdout.read(1), b""):  # type: ignore
-            logger.info(c)
+        for line in process.stdout:  # type: ignore
+            if args.verbose or args.debug:
+                print(line.decode().strip(), flush=True)
     except subprocess.SubprocessError as e:
-        if args.verbose:
+        if args.verbose or args.debug:
             raise e
         else:
             print(
