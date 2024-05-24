@@ -65,7 +65,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "euglenins = euglenida:euglenins.py",
+            "euglenins = euglenida:euglenins",
         ]
     },
 )
