@@ -3,10 +3,12 @@ import os
 import subprocess
 import pathlib
 import sys
+from logging import Logger
 from typing import List
 
 
-def change_tmp_dir(new_path: pathlib.Path) -> None:
+def change_tmp_dir(new_path: pathlib.Path, logger: Logger) -> None:
+    logger.debug(f"Setting $TMPDIR={new_path.resolve()}")
     os.environ["TMPDIR"] = f"'{new_path.resolve()}'"
 
 
@@ -20,7 +22,7 @@ def print_args(args: argparse.Namespace, script_name) -> None:
 
 
 def run_command_with_output(
-    command: List[str], args: argparse.Namespace, script_name: str
+    command: List[str], args: argparse.Namespace, script_name: str, logger: Logger
 ):
     process = subprocess.Popen(
         command,
@@ -28,7 +30,7 @@ def run_command_with_output(
     )
     try:
         for c in iter(lambda: process.stdout.read(1), b""):  # type: ignore
-            sys.stdout.buffer.write(c)
+            logger.info(c)
     except subprocess.SubprocessError as e:
         if args.verbose:
             raise e

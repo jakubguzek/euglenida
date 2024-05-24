@@ -1,6 +1,7 @@
 import argparse
 import itertools
 import pathlib
+from logging import Logger
 from typing import List, Tuple, Union
 
 import joblib
@@ -136,7 +137,7 @@ def qiime_tools_export(
     ]
 
 
-def preprocess(args: argparse.Namespace, script_name: str) -> int:
+def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     if args.verbose:
         utils.print_args(args, script_name=script_name)
 
@@ -155,25 +156,30 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
 
     # Validate outdir path. If it doesn't exist, create it.
     output_dir: pathlib.Path = pathlib.Path(args.outdir)
+    logger.debug(f"Checking if output directory ({output_dir}) exists.")
     if not output_dir.exists():
+        logger.info(f"Output directory: {output_dir}, doesn't exist; creating it.")
         output_dir.mkdir()
 
     imported_reads_artifact_path = output_dir / "reads.qza"
 
+    logger.debug("Setting trimming parameters.")
     trimming_parameters: List[Tuple[int, int, int, int]] = [
         parameters
         for parameters in zip(
             args.trunc_len_f, args.trunc_len_r, args.trim_left_f, args.trim_left_r
         )
     ]
+    logger.info(f"Trimming parameter set to: {trimming_parameters}")
     truncation_parameters: List[int] = args.trunc_q
 
     # Handle the changing of qiime2 tmp directory. If not done can sometimes lead
     # to errors during runnign qiime2 commands
+    logger.debug(f"Setting new tmpdir.")
     tmp_dir = pathlib.Path(args.tmp_dir)
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    utils.change_tmp_dir(tmp_dir)
+    utils.change_tmp_dir(tmp_dir, logger)
 
     import_command = qiime_tools_import(
         args.qiime_path, manifest, imported_reads_artifact_path
@@ -184,12 +190,10 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
         imported_reads_artifact_path.with_suffix(".qzv"),
     )
 
-    if args.verbose:
-        print(f"Running: `{' '.join(import_command)}`")
-    utils.run_command_with_output(import_command, args, script_name)
-    if args.verbose:
-        print(f"Running: `{' '.join(demux_summarization_command)}`")
-    utils.run_command_with_output(demux_summarization_command, args, script_name)
+    logger.info(f"Running command: `{' '.join(import_command)}`")
+    utils.run_command_with_output(import_command, args, script_name, logger)
+    logger.info(f"Running command: `{' '.join(demux_summarization_command)}`")
+    utils.run_command_with_output(demux_summarization_command, args, script_name, logger)
 
     def filter_and_merge(
         trunc_f: int, trunc_r: int, trim_f: int, trim_r: int, trunc_q: int
@@ -198,14 +202,20 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
             output_dir
             / f"filtering_stats_{trunc_f}_{trunc_r}_{trim_f}_{trim_r}_{trunc_q}.qza"
         )
+        logger.debug(f"filtering stats path: {filtering_stats_path}")
+
         filtered_sequences_path = (
             output_dir
             / f"filtered_reads_{trunc_f}_{trunc_r}_{trim_f}_{trim_r}_{trunc_q}.qza"
         )
+        logger.debug(f"filtered sequences path: {filtering_stats_path}")
+
         filtering_table_path = (
             output_dir
             / f"filtering_table_{trunc_f}_{trunc_r}_{trim_f}_{trim_r}_{trunc_q}.qza"
         )
+        logger.debug(f"filtering table path: {filtering_stats_path}")
+
         dada2_command = qiime_dada2(
             args.qiime_path,
             imported_reads_artifact_path,
@@ -219,7 +229,9 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
             truncate_threshold_quality=trunc_q,
             verbose=args.verbose,
         )
-        utils.run_command_with_output(dada2_command, args, script_name)
+
+        logger.info(f"Running command: {' '.join(dada2_command)}")
+        utils.run_command_with_output(dada2_command, args, script_name, logger)
 
         filtering_stats_command = qiime_metadata_tabulate(
             args.qiime_path,
@@ -232,10 +244,13 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
             filtering_table_path.with_suffix(".qzv"),
         )
 
-        utils.run_command_with_output(filtering_stats_command, args, script_name)
-        utils.run_command_with_output(table_visualiztion_command, args, script_name)
+        logger.info(f"Running command: {' '.join(filtering_stats_command)}")
+        utils.run_command_with_output(filtering_stats_command, args, script_name, logger)
+        logger.info(f"Running command: {' '.join(table_visualiztion_command)}")
+        utils.run_command_with_output(table_visualiztion_command, args, script_name, logger)
 
         filtering_table_dir = output_dir / filtering_table_path.stem
+        logger.debug(f"Creating filtering table output dir: {filtering_table_dir}")
         filtering_table_dir.mkdir()
 
         table_export_command = qiime_tools_export(
@@ -243,16 +258,21 @@ def preprocess(args: argparse.Namespace, script_name: str) -> int:
         )
 
         filtered_sequences_dir = output_dir / filtered_sequences_path.stem
+        logger.debug(f"Creating filtered sequences output dir: {filtered_sequences_dir}")
         filtered_sequences_dir.mkdir()
 
         sequences_export_command = qiime_tools_export(
             args.qiime_path, filtered_sequences_path, filtered_sequences_dir
         )
 
-        utils.run_command_with_output(table_export_command, args, script_name)
-        utils.run_command_with_output(sequences_export_command, args, script_name)
+        logger.info(f"Running command: {' '.join(table_export_command)}")
+        utils.run_command_with_output(table_export_command, args, script_name, logger)
+        logger.info(f"Running command: {' '.join(sequences_export_command)}")
+        utils.run_command_with_output(sequences_export_command, args, script_name, logger)
 
     combinations = list(itertools.product(trimming_parameters, truncation_parameters))
+    logger.info(f"Combinations of trimming and quality-based truncation parameters: {combinations}")
+    logger.info(f"Running filtering and merging for different combinations of parameters.")
     joblib.Parallel(n_jobs=args.threads)(
         joblib.delayed(filter_and_merge)(trunc_f, trunc_r, trim_f, trim_r, trunc_q)
         for (trunc_f, trunc_r, trim_f, trim_r), trunc_q in combinations

@@ -1,5 +1,6 @@
 import argparse
 import pathlib
+from logging import Logger
 from typing import List, Optional, Union
 
 from euglenida import utils
@@ -138,7 +139,7 @@ def qiime_phylogeny_midpoint_root(
     ]
 
 
-def classify(args: argparse.Namespace, script_name: str) -> int:
+def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     if args.verbose:
         utils.print_args(args, script_name=script_name)
 
@@ -149,6 +150,7 @@ def classify(args: argparse.Namespace, script_name: str) -> int:
         return 1
 
     classifier = pathlib.Path(args.classifier)
+    logger.debug(f"Validating classifier file path: {classifier}")
     if not classifier.exists():
         print(
             f"\033[31m\033[1m{script_name}: error:\033[0m: {classifier}: No such file or directory!"  # ]]]
@@ -156,6 +158,7 @@ def classify(args: argparse.Namespace, script_name: str) -> int:
         return 1
 
     reads_path = pathlib.Path(args.input_sequences)
+    logger.debug(f"Validating reads file path: {reads_path}")
     if not reads_path.exists():
         print(
             f"\033[31m\033[1m{script_name}: error:\033[0m: {reads_path}: No such file or directory!"  # ]]]
@@ -163,6 +166,7 @@ def classify(args: argparse.Namespace, script_name: str) -> int:
         return 1
 
     table_path = pathlib.Path(args.input_table)
+    logger.debug(f"Validating table file path: {table_path}")
     if not table_path.exists():
         print(
             f"\033[31m\033[1m{script_name}: error:\033[0m: {table_path}: No such file or directory!"  # ]]]
@@ -171,36 +175,44 @@ def classify(args: argparse.Namespace, script_name: str) -> int:
 
     # Validate outdir path. If it doesn't exist, create it.
     output_dir: pathlib.Path = pathlib.Path(args.outdir)
+    logger.debug(f"Checking if output directory ({output_dir}) exists.")
     if not output_dir.exists():
+        logger.info(f"Output directory: {output_dir}, doesn't exist; creating it.")
         output_dir.mkdir()
 
     # Handle the changing of qiime2 tmp directory. If not done can sometimes lead
     # to errors during runnign qiime2 commands
+    logger.debug(f"Setting new tmpdir.")
     tmp_dir = pathlib.Path(args.tmp_dir)
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    utils.change_tmp_dir(tmp_dir)
+    utils.change_tmp_dir(tmp_dir, logger)
 
     classification_path = output_dir / "classification.qza"
     classification_command = qiime_classify(
         args.qiime_path, classifier, reads_path, classification_path
     )
-    utils.run_command_with_output(classification_command, args, script_name)
+    logger.info(f"Running command: {classification_command}")
+    utils.run_command_with_output(classification_command, args, script_name, logger)
 
     classification_metadata_path = classification_path.with_suffix(".qzv")
     metadata_tabulate_command = qiime_metadata_tabulate(
         args.qiime, classification_path, classification_metadata_path
     )
-    utils.run_command_with_output(metadata_tabulate_command, args, script_name)
+    logger.info(f"Running command: {metadata_tabulate_command}")
+    utils.run_command_with_output(metadata_tabulate_command, args, script_name, logger)
 
     barplot_output_path = output_dir / "barplot.qzv"
 
+    logger.debug("Checking if metadata file was passed in.")
     if args.metadata is not None:
         metadata = pathlib.Path(args.metadata)
+        logger.debug("Checking if passed in metadata file exists.")
         if not metadata.exists() and args.verbose:
             print(
                 f"\033[31m\033[1m{script_name}: error:\033[0m: {table_path}: No such file or directory!"  # ]]]
             )
+            return 1
         taxa_barplot_command = qiime_taxa_barplot(
             args.qiime_path,
             table_path,
@@ -213,12 +225,13 @@ def classify(args: argparse.Namespace, script_name: str) -> int:
             args.qiime_path, table_path, classification_path, barplot_output_path
         )
 
-    utils.run_command_with_output(taxa_barplot_command, args, script_name)
+    logger.info(f"Running command: {taxa_barplot_command}")
+    utils.run_command_with_output(taxa_barplot_command, args, script_name, logger)
 
     return 0
 
 
-def rooted_tree(args: argparse.Namespace, script_name: str):
+def rooted_tree(args: argparse.Namespace, logger: Logger, script_name: str):
     if args.verbose:
         utils.print_args(args, script_name=script_name)
 
@@ -229,6 +242,7 @@ def rooted_tree(args: argparse.Namespace, script_name: str):
         return 1
 
     reads_path = pathlib.Path(args.input_sequences)
+    logger.debug(f"Validating reads file path: {reads_path}")
     if not reads_path.exists():
         print(
             f"\033[31m\033[1m{script_name}: error:\033[0m: {reads_path}: No such file or directory!"  # ]]]
@@ -237,15 +251,18 @@ def rooted_tree(args: argparse.Namespace, script_name: str):
 
     # Validate outdir path. If it doesn't exist, create it.
     output_dir: pathlib.Path = pathlib.Path(args.outdir)
+    logger.debug(f"Checking if output directory ({output_dir}) exists.")
     if not output_dir.exists():
+        logger.info(f"Output directory: {output_dir}, doesn't exist; creating it.")
         output_dir.mkdir()
 
     # Handle the changing of qiime2 tmp directory. If not done can sometimes lead
     # to errors during runnign qiime2 commands
+    logger.debug(f"Setting new tmpdir.")
     tmp_dir = pathlib.Path(args.tmp_dir)
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    utils.change_tmp_dir(tmp_dir)
+    utils.change_tmp_dir(tmp_dir, logger)
 
     alignment_output_path = output_dir / "alignment.qza"
     trimmed_alignment_path = output_dir / "alignment_trimmed.qza"
@@ -265,9 +282,13 @@ def rooted_tree(args: argparse.Namespace, script_name: str):
         args.qiime_path, tree_path, rooted_tree_path
     )
 
-    utils.run_command_with_output(alignment_command, args, script_name)
-    utils.run_command_with_output(trimmed_alignment_command, args, script_name)
-    utils.run_command_with_output(tree_command, args, script_name)
-    utils.run_command_with_output(root_command, args, script_name)
+    logger.info(f"Running command: {alignment_command}")
+    utils.run_command_with_output(alignment_command, args, script_name, logger)
+    logger.info(f"Running command: {trimmed_alignment_command}")
+    utils.run_command_with_output(trimmed_alignment_command, args, script_name, logger)
+    logger.info(f"Running command: {tree_command}")
+    utils.run_command_with_output(tree_command, args, script_name, logger)
+    logger.info(f"Running command: {root_command}")
+    utils.run_command_with_output(root_command, args, script_name, logger)
 
     return 0
