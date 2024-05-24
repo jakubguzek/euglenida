@@ -1,6 +1,5 @@
 import argparse
 import itertools
-import os
 import pathlib
 from typing import List, Tuple, Union
 

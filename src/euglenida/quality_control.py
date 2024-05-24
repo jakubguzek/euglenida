@@ -1,7 +1,5 @@
 import argparse
 import pathlib
-import subprocess
-import sys
 
 from euglenida import utils
 
