@@ -2,9 +2,12 @@ import argparse
 import os
 import subprocess
 import pathlib
-import sys
 from logging import Logger
-from typing import List
+from typing import Any, List
+
+
+def command_to_str(command: List[Any]) -> str:
+    return ' '.join([str(item) for item in command])
 
 
 def change_tmp_dir(new_path: pathlib.Path, logger: Logger) -> None:

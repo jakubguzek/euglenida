@@ -190,9 +190,9 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
         imported_reads_artifact_path.with_suffix(".qzv"),
     )
 
-    logger.info(f"Running command: `{' '.join(import_command)}`")
+    logger.info(f"Running command: `{utils.command_to_str(import_command)}`")
     utils.run_command_with_output(import_command, args, script_name, logger)
-    logger.info(f"Running command: `{' '.join(demux_summarization_command)}`")
+    logger.info(f"Running command: `{utils.command_to_str(demux_summarization_command)}`")
     utils.run_command_with_output(demux_summarization_command, args, script_name, logger)
 
     def filter_and_merge(
@@ -230,7 +230,7 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
             verbose=args.verbose,
         )
 
-        logger.info(f"Running command: {' '.join(dada2_command)}")
+        logger.info(f"Running command: {utils.command_to_str(dada2_command)}")
         utils.run_command_with_output(dada2_command, args, script_name, logger)
 
         filtering_stats_command = qiime_metadata_tabulate(
@@ -244,9 +244,9 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
             filtering_table_path.with_suffix(".qzv"),
         )
 
-        logger.info(f"Running command: {' '.join(filtering_stats_command)}")
+        logger.info(f"Running command: {utils.command_to_str(filtering_stats_command)}")
         utils.run_command_with_output(filtering_stats_command, args, script_name, logger)
-        logger.info(f"Running command: {' '.join(table_visualiztion_command)}")
+        logger.info(f"Running command: {utils.command_to_str(table_visualiztion_command)}")
         utils.run_command_with_output(table_visualiztion_command, args, script_name, logger)
 
         filtering_table_dir = output_dir / filtering_table_path.stem
@@ -265,9 +265,9 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
             args.qiime_path, filtered_sequences_path, filtered_sequences_dir
         )
 
-        logger.info(f"Running command: {' '.join(table_export_command)}")
+        logger.info(f"Running command: {utils.command_to_str(table_export_command)}")
         utils.run_command_with_output(table_export_command, args, script_name, logger)
-        logger.info(f"Running command: {' '.join(sequences_export_command)}")
+        logger.info(f"Running command: {utils.command_to_str(sequences_export_command)}")
         utils.run_command_with_output(sequences_export_command, args, script_name, logger)
 
     combinations = list(itertools.product(trimming_parameters, truncation_parameters))

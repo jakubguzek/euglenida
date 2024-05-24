@@ -11,7 +11,7 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
 
     # Validate input file paths
     input_files = [pathlib.Path(path) for path in args.input_files]
-    logger.debug(f"Validating input file paths: {input_files}")
+    logger.debug(f"Validating input file paths: {[str(file) for file in input_files]}")
     files_exist = [path.exists() for path in input_files]
     if not all(files_exist):
         non_existent_file = input_files[files_exist.index(False)]
@@ -50,7 +50,7 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
         "--outdir",
         f"{fastqc_dir}",
     ]
-    logger.info(f"Running command: {' '.join(fastqc_command)}")
+    logger.info(f"Running command: {utils.command_to_str(fastqc_command)}")
     utils.run_command_with_output(fastqc_command, args, script_name, logger)
 
     multiqc_command = [
@@ -61,7 +61,7 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
         "--outdir",
         f"{multiqc_dir}",
     ]
-    logger.info(f"Running command: {' '.join(multiqc_command)}")
+    logger.info(f"Running command: {utils.command_to_str(multiqc_command)}")
     utils.run_command_with_output(multiqc_command, args, script_name, logger)
 
     return 0

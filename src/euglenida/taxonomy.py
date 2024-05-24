@@ -192,14 +192,14 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     classification_command = qiime_classify(
         args.qiime_path, classifier, reads_path, classification_path
     )
-    logger.info(f"Running command: {classification_command}")
+    logger.info(f"Running command: {utils.command_to_str(classification_command)}")
     utils.run_command_with_output(classification_command, args, script_name, logger)
 
     classification_metadata_path = classification_path.with_suffix(".qzv")
     metadata_tabulate_command = qiime_metadata_tabulate(
         args.qiime, classification_path, classification_metadata_path
     )
-    logger.info(f"Running command: {metadata_tabulate_command}")
+    logger.info(f"Running command: {utils.command_to_str(metadata_tabulate_command)}")
     utils.run_command_with_output(metadata_tabulate_command, args, script_name, logger)
 
     barplot_output_path = output_dir / "barplot.qzv"
@@ -225,7 +225,7 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
             args.qiime_path, table_path, classification_path, barplot_output_path
         )
 
-    logger.info(f"Running command: {taxa_barplot_command}")
+    logger.info(f"Running command: {utils.command_to_str(taxa_barplot_command)}")
     utils.run_command_with_output(taxa_barplot_command, args, script_name, logger)
 
     return 0
@@ -282,13 +282,13 @@ def rooted_tree(args: argparse.Namespace, logger: Logger, script_name: str):
         args.qiime_path, tree_path, rooted_tree_path
     )
 
-    logger.info(f"Running command: {alignment_command}")
+    logger.info(f"Running command: {utils.command_to_str(alignment_command)}")
     utils.run_command_with_output(alignment_command, args, script_name, logger)
-    logger.info(f"Running command: {trimmed_alignment_command}")
+    logger.info(f"Running command: {utils.command_to_str(trimmed_alignment_command)}")
     utils.run_command_with_output(trimmed_alignment_command, args, script_name, logger)
-    logger.info(f"Running command: {tree_command}")
+    logger.info(f"Running command: {utils.command_to_str(tree_command)}")
     utils.run_command_with_output(tree_command, args, script_name, logger)
-    logger.info(f"Running command: {root_command}")
+    logger.info(f"Running command: {utils.command_to_str(root_command)}")
     utils.run_command_with_output(root_command, args, script_name, logger)
 
     return 0

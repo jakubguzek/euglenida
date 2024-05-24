@@ -1,0 +1,3 @@
+[2024-05-24 11:25:48] [INFO] Output directory: results, doesn't exist; creating it.
+[2024-05-24 11:25:48] [INFO] Fastqc directory: results/fastqc, doesn't exist; creating it.
+[2024-05-24 11:25:48] [INFO] Multiqc directory: results/multiqc, doesn't exist; creating it.
