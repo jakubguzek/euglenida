@@ -23,7 +23,7 @@ def read(*names, **kwargs):
 
 setup(
     name="euglenida",
-    version="0.2.0",
+    version="0.3.0",
     license="MIT",
     description="Scripts and programs for metagenomics project analyses",
     long_description="{}".format(
