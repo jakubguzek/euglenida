@@ -53,7 +53,7 @@ def qiime_taxa_barplot(
             qiime_path,
             "taxa",
             "barplot",
-            "--0-table",
+            "--i-table",
             f"{table_path}",
             "--i-taxonomy",
             f"{classification_path}",
@@ -66,7 +66,7 @@ def qiime_taxa_barplot(
         qiime_path,
         "taxa",
         "barplot",
-        "--0-table",
+        "--i-table",
         f"{table_path}",
         "--i-taxonomy",
         f"{classification_path}",
@@ -197,7 +197,7 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
 
     classification_metadata_path = classification_path.with_suffix(".qzv")
     metadata_tabulate_command = qiime_metadata_tabulate(
-        args.qiime, classification_path, classification_metadata_path
+        args.qiime_path, classification_path, classification_metadata_path
     )
     logger.info(f"Running command: {utils.command_to_str(metadata_tabulate_command)}")
     utils.run_command_with_output(metadata_tabulate_command, args, script_name, logger)
