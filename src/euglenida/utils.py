@@ -10,9 +10,13 @@ def command_to_str(command: List[Any]) -> str:
     return ' '.join([str(item) for item in command])
 
 
-def change_tmp_dir(new_path: pathlib.Path, logger: Logger) -> None:
-    logger.debug(f"Setting $TMPDIR={new_path.resolve()}")
-    os.environ["TMPDIR"] = f"'{new_path.resolve()}'"
+def new_tmp_dir_env(new_path: pathlib.Path, logger: Logger) -> dict[str, str]:
+    logger.debug(f"Creating envrionment with $TMPDIR={new_path.resolve()}")
+    current_env = os.environ.copy()
+    current_env["TMPDIR"] = f"'{new_path.resolve()}'"
+    logger.debug("Current shell envrionment:")
+    logger.debug(f"{current_env}")
+    return current_env
 
 
 def print_args(args: argparse.Namespace, script_name) -> None:
@@ -25,12 +29,13 @@ def print_args(args: argparse.Namespace, script_name) -> None:
 
 
 def run_command_with_output(
-    command: List[str], args: argparse.Namespace, script_name: str, logger: Logger
+    command: List[str], env: dict[str, str], args: argparse.Namespace, script_name: str, logger: Logger
 ):
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
+        stderr=subprocess.STDOUT,
+        env=env
     )
     try:
         for line in process.stdout:  # type: ignore

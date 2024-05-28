@@ -186,21 +186,21 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     tmp_dir = pathlib.Path(args.tmp_dir)
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    utils.change_tmp_dir(tmp_dir, logger)
+    env_with_tmpdir = utils.new_tmp_dir_env(tmp_dir, logger)
 
     classification_path = output_dir / "classification.qza"
     classification_command = qiime_classify(
         args.qiime_path, classifier, reads_path, classification_path
     )
     logger.info(f"Running command: {utils.command_to_str(classification_command)}")
-    utils.run_command_with_output(classification_command, args, script_name, logger)
+    utils.run_command_with_output(classification_command, env_with_tmpdir, args, script_name, logger)
 
     classification_metadata_path = classification_path.with_suffix(".qzv")
     metadata_tabulate_command = qiime_metadata_tabulate(
         args.qiime_path, classification_path, classification_metadata_path
     )
     logger.info(f"Running command: {utils.command_to_str(metadata_tabulate_command)}")
-    utils.run_command_with_output(metadata_tabulate_command, args, script_name, logger)
+    utils.run_command_with_output(metadata_tabulate_command, env_with_tmpdir, args, script_name, logger)
 
     barplot_output_path = output_dir / "barplot.qzv"
 
@@ -226,7 +226,7 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
         )
 
     logger.info(f"Running command: {utils.command_to_str(taxa_barplot_command)}")
-    utils.run_command_with_output(taxa_barplot_command, args, script_name, logger)
+    utils.run_command_with_output(taxa_barplot_command, env_with_tmpdir, args, script_name, logger)
 
     return 0
 
@@ -262,7 +262,7 @@ def rooted_tree(args: argparse.Namespace, logger: Logger, script_name: str):
     tmp_dir = pathlib.Path(args.tmp_dir)
     if not tmp_dir.exists():
         tmp_dir.mkdir()
-    utils.change_tmp_dir(tmp_dir, logger)
+    env_with_tmpdir = utils.new_tmp_dir_env(tmp_dir, logger)
 
     alignment_output_path = output_dir / "alignment.qza"
     trimmed_alignment_path = output_dir / "alignment_trimmed.qza"
@@ -283,12 +283,12 @@ def rooted_tree(args: argparse.Namespace, logger: Logger, script_name: str):
     )
 
     logger.info(f"Running command: {utils.command_to_str(alignment_command)}")
-    utils.run_command_with_output(alignment_command, args, script_name, logger)
+    utils.run_command_with_output(alignment_command, env_with_tmpdir, args, script_name, logger)
     logger.info(f"Running command: {utils.command_to_str(trimmed_alignment_command)}")
-    utils.run_command_with_output(trimmed_alignment_command, args, script_name, logger)
+    utils.run_command_with_output(trimmed_alignment_command, env_with_tmpdir, args, script_name, logger)
     logger.info(f"Running command: {utils.command_to_str(tree_command)}")
-    utils.run_command_with_output(tree_command, args, script_name, logger)
+    utils.run_command_with_output(tree_command, env_with_tmpdir, args, script_name, logger)
     logger.info(f"Running command: {utils.command_to_str(root_command)}")
-    utils.run_command_with_output(root_command, args, script_name, logger)
+    utils.run_command_with_output(root_command, env_with_tmpdir, args, script_name, logger)
 
     return 0

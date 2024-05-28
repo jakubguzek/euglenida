@@ -1,4 +1,5 @@
 import argparse
+import os
 import pathlib
 from logging import Logger
 
@@ -51,7 +52,7 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
         f"{fastqc_dir}",
     ]
     logger.info(f"Running command: {utils.command_to_str(fastqc_command)}")
-    utils.run_command_with_output(fastqc_command, args, script_name, logger)
+    utils.run_command_with_output(fastqc_command, os.environ.copy(), args, script_name, logger)
 
     multiqc_command = [
         f"{args.multiqc_path}",
@@ -62,7 +63,7 @@ def quality_control(args: argparse.Namespace, logger: Logger, script_name) -> in
         f"{multiqc_dir}",
     ]
     logger.info(f"Running command: {utils.command_to_str(multiqc_command)}")
-    utils.run_command_with_output(multiqc_command, args, script_name, logger)
+    utils.run_command_with_output(multiqc_command, os.environ.copy(), args, script_name, logger)
 
     logger.info("Qulity control script finished succesfully")
     return 0
