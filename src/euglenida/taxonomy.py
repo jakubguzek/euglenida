@@ -189,9 +189,15 @@ def classify(args: argparse.Namespace, logger: Logger, script_name: str) -> int:
     env_with_tmpdir = utils.new_tmp_dir_env(tmp_dir, logger)
 
     classification_path = output_dir / "classification.qza"
-    classification_command = qiime_classify(
-        args.qiime_path, classifier, reads_path, classification_path
-    )
+    classification_command = [
+        str((pathlib.Path(__file__).parent / "classification.sh").resolve()),
+        args.qiime_path,
+        classifier,
+        reads_path,
+        classification_path,
+        tmp_dir,
+        '1' if (args.verbose or args.debug) else '0'
+    ]
     logger.info(f"Running command: {utils.command_to_str(classification_command)}")
     utils.run_command_with_output(classification_command, env_with_tmpdir, args, script_name, logger)
 
