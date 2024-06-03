@@ -49,7 +49,7 @@ install_analyses_libraries <- function(verbose = FALSE) {
 
   # Load CRAN ackages or install them if they ar not already installed,
   cran_packages <- c(
-    "vegan", "tidyverse", "ggplot2", "plyr", "dplyr", "fansi", "remotes"
+    "optparse", "vegan", "tidyverse", "ggplot2", "plyr", "dplyr", "fansi", "remotes"
   )
   install_load(cran_packages, verbose = verbose)
 
