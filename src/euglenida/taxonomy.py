@@ -84,8 +84,8 @@ def qiime_alignment_mafft(
         qiime_path,
         "alignment",
         "mafft",
+        "--i-sequences",
         f"{input_sequences_path}",
-        "sekwencje_euglenin.qza",
         "--o-alignment",
         f"{output_alignment_path}",
     ]
