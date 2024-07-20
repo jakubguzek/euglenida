@@ -1,0 +1,9 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is '/home/jakub/Documents/studia/rok2/metagenomika/project/report/Guzek_zadanie1.blg'
+[52] biber:340> INFO - === nie lip 21, 2024, 00:10:12
+[62] Biber.pm:419> INFO - Reading '/home/jakub/Documents/studia/rok2/metagenomika/project/report/Guzek_zadanie1.bcf'
+[101] Biber.pm:979> INFO - Found 0 citekeys in bib section 0
+[109] bbl.pm:660> INFO - Writing '/home/jakub/Documents/studia/rok2/metagenomika/project/report/Guzek_zadanie1.bbl' with encoding 'UTF-8'
+[109] bbl.pm:763> INFO - Output to /home/jakub/Documents/studia/rok2/metagenomika/project/report/Guzek_zadanie1.bbl
+[109] Biber.pm:131> WARN - The file '/home/jakub/Documents/studia/rok2/metagenomika/project/report/Guzek_zadanie1.bcf' does not contain any citations!
+[110] Biber.pm:133> INFO - WARNINGS: 1

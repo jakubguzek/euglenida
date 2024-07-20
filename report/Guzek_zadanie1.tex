@@ -1,0 +1,341 @@
+\documentclass[two column, twoside, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{paralist}
+\usepackage{gensymb}
+\usepackage{chemmacros}
+\usepackage{booktabs}
+\usepackage{dblfloatfix}
+\usepackage{url}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage{titling}
+\usepackage{caption}
+\usepackage[backend=biber, maxbibnames=3, style=nature, autocite=inline]{biblatex}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{blindtext}
+\usepackage{cuted}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{newfloat}
+\usepackage[referable]{threeparttablex}
+\usepackage[most]{tcolorbox}
+\usepackage[columnsep = 1cm,
+	        lmargin = 0.4in,
+	        rmargin = 0.4in,
+	        tmargin = 0.5in,
+	        bmargin = 0.65in,
+	        headsep = \baselineskip]{geometry}
+
+\addbibresource{$BIB}
+\renewcommand{\bibfont}{\normalfont\scriptsize}
+
+\renewlist{tablenotes}{enumerate}{1}
+\makeatletter
+\setlist[tablenotes]{label=\tnote{\alph*},ref=\alph*,itemsep=\z@,topsep=\z@skip,partopsep=\z@skip,parsep=\z@,itemindent=\z@,labelindent=\tabcolsep,labelsep=.2em,leftmargin=*,align=left,before={\footnotesize}}
+\makeatother
+
+\tolerance=8000
+\emergencystretch=10pt
+\hyphenpenalty=5000
+\exhyphenpenalty=100
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=cyan,
+    citecolor=magenta
+  }
+
+  \DeclareCaptionLabelSeparator{pipe}{\,|\,}
+\captionsetup{font={small,sf}, labelfont=bf, labelsep=pipe, belowskip=0pt, aboveskip=0pt}
+
+\setlength{\textfloatsep}{5pt plus 2pt minus 2pt}
+\setlength{\floatsep}{5pt plus 2pt minus 2pt}
+\setlength{\intextsep}{5pt plus 2pt minus 2pt}
+
+\DeclareFloatingEnvironment[name={Tabela uzupełniająca},fileext=lst,listname={List of 
+Supplementary Tables}]{supptable}
+
+\DeclareFloatingEnvironment[name={Rysunek uzupełniający},fileext=lst,listname={List of 
+Supplementary Figures}]{suppfigure}
+
+\raggedbottom
+
+%%% Custom commands and variables %%%
+
+\newcommand{\subjectname}{Metagenomika i filogenetyka molekularna}
+\newcommand{\faculty}{Wydział Matematyki, Informatyki i Mechaniki}
+\newcommand{\institution}{Uniwersytet Warszawski}
+
+\newcommand*\circled[1]{\tikz[baseline=(char.bae)]{
+            \node[shape=circle,draw,inner sep=2pt, color = orange!90!white] (char) {#1};}}
+
+%%% Section Formatting %%%
+\titleformat{\section}
+{\sf \bfseries \Large}
+{}
+{0em}
+{}[\vspace{-0.3em}]
+
+\titleformat{\subsection}
+{\bfseries}
+{}
+{0em}
+{}
+
+\titleformat{\subsubsection}
+{\itshape}
+{}
+{0em}
+{}
+
+%%% Box formatting %%
+\tcbset{sharp corners, enhanced, colback=white, boxrule = 1pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[RE, LO]{\institution}
+\fancyhead[LE, RO]{\faculty}
+\fancyfoot[RE, LO]{\theauthor}
+\fancyfoot[LE, RO]{\thepage}
+\fancyfoot[CE,CO]{\subjectname}
+\renewcommand{\footrulewidth}{0.05pt}
+
+\title{Autotroficzne eugleniny w małych zbiornikach wodnych}
+\author{Jakub J. Guzek}
+
+\begin{document}
+
+\begin{strip}
+  {\bfseries \LARGE \fontfamily{phv}\selectfont \thetitle} \vspace{\baselineskip}
+
+	{\bfseries \large \theauthor}
+
+	{\institution, \faculty, \subjectname, \\ Student ID: 456616}\vspace{\baselineskip}
+
+	\hrule\vspace{\baselineskip}
+
+	\textbf{\textsf{
+    Formalnie, w tej pracy, eugleniny będą definiowane jako grupa organizmów przynależąca do supergrupy Excavata, i klasy Euglenida. Jedną z charakterystycznych cech organizmów z tej grupy jest obecność pelikuli -- białkowej struktury otaczającej komórkę. Większość euglenin jest zdolna do fotosyntezy, a wielu przedstawicieli tej grupy ma zdolność do fagocytozy. Organizmy te występują często w słodkowodnych zbiornikach wodnych. W tej pracy przedstawiam analizę fragmentu zbioru danych metagenomicznych zebranych w trakcie badań prowadzonych w latach 2017-2019 w kilkunastu zbiornikach wodnych zlokalizowanych w różnych rejonach Polski.
+  }}
+	\vspace{\baselineskip}
+
+	\hrule
+
+\end{strip}
+
+\section{Wstęp}
+
+W latach 2017 - 2019 prowadzono badania mające na celu przeanalizowanie składu taksonomicznego i
+różnorodności biologicznej autotroficznych euglenin w kilkunastu niewielkich zbiornikach wodnych
+zlokalizowanych w różnych regionach Polski.
+
+Próbki wody z wybranych zbiorników były pobierane czterokrotnie w ciągu sezonu wegetacyjnego w latach
+2017, 2018 i 2019. Pobrany materiał był osadzanym na filtrach, z których następnie izolowano całkowity DNA.
+Następnie przeprowadzano amplifikację rejonu V2 18S rDNA z użyciem starterów specyficznych dla euglenin
+
+\begin{align*}
+  \text{Forward: } & \text{\texttt{CTGTGAATGGCTCCTTACATCAG}} \\
+  \text{Reverse: } & \text{\texttt{CTSCCTCTCCGGAATCRAAC}}
+\end{align*}
+
+Tak otrzymane amplikony poddano sekwencjonowaniu wysokoprzepustowemu i otrzymano pliki w formacie fastq z odczytami przypisanymi do poszczególnych próbek.
+
+Poniżej prezentuję wyniki przeprowadzonej przeze mnie analizy danych i odpowiedzi na pytania z Zadania 1 z Metagnomiki i filogenetyki moleularnej.
+
+\section{Kontrola jakości danych}
+
+\begin{figure*}[ht]
+  \begin{center}
+    \includegraphics[width=\textwidth]{figures/qc_plots.pdf}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.35em}
+
+  \caption{\textbf{Wyniki analizy jakości danych.} \textbf{a.} Wykres słupkowy przedstawiający ilość odczytów w poszczególnych plikach; kolory oznaczają zbiornik z którego została pobrana dana próbka. \textbf{b.} Wykresy pudełkowe przestawiające rozproszenie i kształt rozkładu ilości odczytów pogrupowanej po: zbiornikach, rejonach polski i porach roku. \textbf{c.} Histogram i wykres pudełkowy przedstawiające długości odczytów, pogrupowane po odczytach foraward i reverse. \textbf{d.} Procent odczytów, w których obecna była sekwencja startera, dla wszystkich próbek; słupki błędów reprezentują różnice między odczytami forward i reverse dla danej próbki. \textbf{e.} Średnia jakość odczytów na danej pozycji w odczycie, dla wszystkich próbek.}
+  \label{fig:qc}
+\end{figure*}
+
+
+W analizowanym podzbiorze danych, ilość odczytów w próbkach wahała się od ok. 75\,000 do ok. 175\,000 tys. (Rys. \ref{fig:qc}a); pora roku w trakcie której pobrano próbki zdawała się nie mieć wpływu na ilość otrzymanych odczytów, ale liczba odczytów silnie wahała się pomiędzy zbiornikami. Zbiorniki Izdebno 1 i Izdebno Nowe miały średnio najwięcej odczytów -- tylko jedna próbka (198\_INo) z tych dwóch zbiorników, nie miała większej ilości odczytów od próbek z pozostałych zbiorników (Rys. \ref{fig:qc}b). To miało przełożenie, na średnio większą ilość odczytów uzyskanych ze zbiorników położonych na Mazowszu (Izdebno 1, Izdebno Nowe i Załotnia) w porównaniu do tych położonych na Kaszubach (Choczweo, Rybno1 i Rybno2).
+
+Większość uzyskanych odczytów była długości 250 nukleotydów, lub dłuższa (Rys. \ref{fig:qc}c), co jest raczej typową długością dla sekwencjonowania w technologią Illumina. Próbki zostały zsekwencjonowane trybem Paired End, co oznacza, że każda cząsteczka kwasu nukleinowego z bibliotek została zsekwencjonowana najpierw od jednej strony a następnie z drugiej. W związku z tym dla każdej próbki dostępne były dwa pliki \texttt{.fastq} -- jeden z odczytami \textit{forward} oraz jeden z odczytami \textit{reverse}. Odczyty \textit{forawrd} były średnio dłuższe od odczytów \textit{reverse} (Rys. \ref{fig:qc}c), czego należy się spodziewać w sekwencjonowaniu technologią Illumina. Na początku większości odczytów we wszystkich próbkach występowały sekwencje starterów użytych do uzyskania sekwencjonowanych amplikonów (Rys. \ref{fig:qc}d).
+
+Uzyskane odczyty cechowały się dobrą jakością na prawie całej długości sekwencji, za wyjątkiem samych końców, gdzie widać wyraźny spadek jakości (Rys. \ref{fig:qc}e); spadek ten jest silniejszy i zaczyna się wcześniej, ok. 200-220 nukleotydów, dla odczytów \textit{reverse} (Rys. uzup. \ref{fig:quality}), w stosunku do odczytów \textit{forawrd}, dla których zaczyna się ok 240 nukleotydów.
+
+Na podstawie uzyskanych wyników, dobrane zostały następujące parametry filtrowania i przycinania surowych odczytów: (1) przycięcie odczytów do długości 240, 220, 200 dla odczytów \textit{forward} i 220, 200, 180 dla odczytów \textit{reverse}, (2) przycięcie 15 lub 40 nukleotydów z początku odczytów. (3) odrzucenie odczytów, w których jakość dla dowolnej pozycji była poniżej 15, 12 lub 10 phred score.
+
+\section{Procesowanie danych}
+
+Decyzja o przycięciu pewnej ilości nukleotydów z początków odczytów została podjęta na podstawie dużej powtarzalności początków sekwencji we wszystkich próbkach (Rys. uzup. \ref{fig:content}). Wszystkie kombinacje wymienionych wcześniej parametrów zostały przetestowane (Rys. uzup. \ref{fig:filtering_stats}) i ostatecznie wybrana została kombinacja zachowująca średnio największą ilość odczytów po usunięciu chimer: (1) przycięcie \textit{forawrd} do 240 nt. (2) przycięcie \textit{reverse} do 200 nt. (3) usunięcie 40 nukleotydów z początku wszystkich odczytów oraz (4) odrzucenie wszystkich odczytów o jakości poniżej 10. Dla tych parametrów po usunięciu chimer zachowane zostało od 23.71\% (166\_RybM) do 58.96\% (93\_Cho) odczytów (mediana dla próbek: $\sim$40\%), co przekładało się na 3\,166 sekwencji reprezentatywnych (ASV -- \textit{ang. amplicon sequence variants}). Wszystkie dalsze analizy były prowadzone przy wykorzystaniu ASV uzyskanych z tymi parametrami.
+
+Wszystkie kombinacje parametrów zachowywały relatywnie dużo odczytów po wstępnym filtrowaniu, jednak niektóre kombinacje prowadziły do bardzo małych ilości złączonych i niechimerycznych odczytów -- w skrajnych wypadkach do bliskich zeru w niektórych próbkach (Rys. uzup. \ref{fig:filtering_stats}). Te wyjątkowo niskie wyniki były obserwowalne głównie dla kombinacji parametrów, w których zarówno odczyty \textit{forward} jak i \textit{reverse} były skrajnie przycinane (200 nt. i 180 nt.), co zapewne prowadziło do tego, że obszar nałożenia się między nimi był niewystarczająco długi do poprawnego złączenia dwóch końców sekwencji amplikonu (fragment V2 rDNA ma 250 nt.).
+
+\section{Przyporządkowanie taksonomiczne}
+
+\begin{figure*}
+  \begin{center}
+    \includegraphics[width=\textwidth]{figures/tax_plots.pdf}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.35em}
+
+  \caption{\textbf{Próbki i poszczególne zbiorniki znacząco różnią się składami taksonomicznymi, oraz udziałem odczytów przypisanych do euglenin.} \textbf{a.} Wykres słupkowy przedstawiający skład taksonomiczny poszczególnych próbek jako procentowy udział wybranych grup taksonomicznych. \textbf{b.} Wykres słupkowy przedstawiający procentowy udział ASV zaklasyfikowanych do grupy Euglenida w poszczególnych próbkach. \textbf{c.} Wykres słupkowy (lewo) pokazujący średnią ilość odczytów przypisanych do danego gatunku i wykres pudełkowy (prawo) przedstawiający rozproszenie i rozkład ilości odczytów przypisanych do danego gatunku w próbkach. \textbf{d.} Wykresy pudełkowe pokazujące rozproszenie udziału procentowego ASV przypisanych do Euglenida w różnych zbiornikach, rejonach Polski i porach roku.}
+  \label{fig:taxa}
+\end{figure*}
+
+Po filtrowaniu i połączeniu amplikonów, uzyskane ASV zostały przyporządkowane do znanej taksonomii. Do klasyfikacji użyty został gotowy wytrenowany klasyfikator (\texttt{klasyfikatorEu\_04.04.24.qza}). Następnie na podstawie uzyskanej klasyfikacji sprawdzone zostały składy taksonomiczne poszczególnych próbek. Najliczniejszymi grupami taksonomicznymi we wszystkich próbkach były: Euglenida, Ciliophora, Ochrophyta, Chlorophyta i Bicosoecida (Rys. \ref{fig:taxa}a). Odczyty zaklasyfikowane do euglenin stanowiły ponad 50\% we wszystkich próbach oprócz dwóch (Rys. \ref{fig:taxa}b). Średnio najliczniejsze były ASV przypisane do gatunków: (1) \textit{Colacium simplex}, (2) \textit{Discoplastis excavata} i (3) \textit{Trachelomonas rugulosa} (Rys. \ref{fig:taxa}c).
+
+Największy procentowy udział euglenin miały zbiorniki Rybno1 i Izdebno 1. Udział procentowy wydaje się być nieznacznie mniejszy w próbkach zebranych wiosną w porównaniu do tych zebranych latem i jesienią. Natomiast rejon Polski nie wydaje się mieć znaczącego wpływu na ilość sekwencji euglenin w próbkach\footnote{Żeby dokładnie to ocenić należałoby sprawdzić istotność statystyczną różnic między grupami, ale zabrakło na to czasu} (Rys. \ref{fig:taxa}d).
+
+
+\section{Skład taksonomiczny}
+
+\begin{figure*}[t]
+  \begin{center}
+    \includegraphics[width=\textwidth]{figures/composition_plots.pdf}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.35em}
+
+  \caption{
+    \textbf{Zbiorniki różnią się pod względem ilości odczytów, obecnych OTU i ilością OTU przypisanych do różnych rodzajów Euglenida} 
+    \textbf{a. b.} Krzywe wysycenia dla wszystkich próbek, pokolorowane po zbiorniku (\textbf{a}) lub po próbce (\textbf{b}).
+    \textbf{c.} Liczba odczytów w poszczególnych próbkach po odfiltrowaniu odczytów nienależących do grupy Euglenida.
+    \textbf{d.} Wykres słupkowy obrazujący skład gatunkowy eulglenin w różnych zbiornikach, pokolorowany po rodzajach.
+    \textbf{e.} Heatmapa pokazująca ilość poszczególnych OTU (gatunków) w próbkach.
+    \textbf{f.} Drzewo filogenetyczne gatunków ze wszystkich próbek, pokazujące liczebność poszczególnych OTU (gatunków) w próbkach, pokolorowane po zbiornikach.
+  }
+  \label{fig:taxa_composition}
+\end{figure*}
+
+W celu przeprowadzenia właściwych analiz dotyczących bioróżnorodności euglenin w otrzymanych próbkach, dane otrzymane w poprzednich krokach (ASV, tabela z liczebnością ASV przyporządkowanych do taksonów w próbkach, drzew filogenetyczne zaklasyfikowanych ASV oraz metadane), zostały wczytane do obiektu \texttt{phyloseq} przy pomocy biblioteki \href{https://github.com/jbisanz/qiime2R/}{qiime2R}. Na tym etapie wszystkie operacje przeprowadzane były na poziomie pojedynczych ASV, stanowiących teraz OTU (\textit{Operational Taxonomic Unit}). Otrzymany obiekt \texttt{phyloseq} przefiltrowano tak aby usunąć z niego wszystkie OTU nienależące do grupy Euglenida, a następnie zapisano go do pliku, w formacie \texttt{rds}, do późniejszych analiz.
+
+Przed odfiltrowaniem danych niedotyczących euglenin obiekt \texttt{phyloseq} zawierał 3\,166 OTU oraz 7 poziomów taksonomicznych; próbka z najmniejszą ilością odczytów (67\_RybM) miała ich 22\,003, a próbka z największą ilością (348\_Cho) miała ich 71\,507. Po odfiltrowaniu liczba OTU spadła do 2\,776, a minimalna i maksymalna ilość odczytów w próbkach wynosiła odpowiednio 18\,046 (67\_RybM) i 56\,098 (202\_IK1) (Rys. \ref{fig:taxa_composition}b). Jak łatwo zauważyć, próbka 348\_Cho nie jest już najliczniejszą próbka po odfiltrowaniu OTU nienależących do euglenin -- jest to spodziewane biorąc pod uwagę, że jest to próbka w której ASV przypisane do tej grupy miały najmniejszy procentowy udział (Rys. \ref{fig:taxa}b).
+
+Aby uniknąć wrażenia fałszywej dokładności analiz, ASV zostały połączone w gatunki do których zostały przypisane. Wszystkie kolejne kroki zostały przeprowadzone na OTU dopowiadających gatunkom, połączonym z przypisanych do nich ASV. Następnie przeprowadzono analizę wysycenia próbek i stworzono krzywe wysycenia (Rys. \ref{fig:taxa_composition}a), aby ocenić strategię próbkowania w dół. Na podstawie krzywych wysycenia zdecydowano aby w czasie próbkowania w dół sprowadzić liczbę odczytów w próbkach do liczby odczytów w najmniej licznej próbce (18046 odczytów -- 67\_RybM, Rys. \ref{fig:taxa_composition}b) -- w ten sposób nie musimy pozbywać się żadnej próbki z analizy, nie tracąc przy tym znacząco informacji o różnorodności biologicznej z bardziej licznych próbek.
+
+Po próbkowaniu w dół, otrzymano próbki o równej liczności odczytów, co znacząco ułatwia przeprowadzanie i interpretację analiz. Przed przystąpieniem do analiz różnorodności biologicznej przeprowadzono eksploracyjną analizę danych poprzez wizualizację składu taksonomicznego. Zgodnie z tym co zaobserwowano przed wyrównaniem wielkości próbek (Rys. \ref{fig:taxa}c) organizmy z rodzaju \textit{Trachelomonas} były najliczniejszą grupą w wielu zbiornikach; wraz z rodzajami \textit{Colacium, Euglenaria} i \textit{Phacus} stanowiły większość organizmów (Rys. \ref{fig:taxa_composition}d). 
+
+Eksploracyjna analiza danych wskazywała również na większe podobieństwo między próbkami z tego samego zbiornika, w stosunku do podobieństwa między próbkami z różnych zbiorników, bez wyraźnej segregacji po porach roku, czy regionie Polski (Rys. \ref{fig:taxa_composition}e). Nie zaobserwowano również klarownej zależności między pokrewieństwem filogentycznm poszczególnych gatunków, a ich występowaniem w konkretnych zbiornikach, czy regionach lub w czasie konkretnych pór roku (Rys. \ref{fig:taxa_composition}f).
+
+Aby zweryfikować te wstępne obserwacje przeprowadzono ilościowe analizy różnorodności biologicznej.
+
+\section{Różnorodność biologiczna}
+
+\begin{figure*}[ht]
+  \vspace{-0.95em}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{figures/diversity.pdf}
+  \end{center}
+
+  \vspace{-0.7em}
+
+  \hrule width0.5\textwidth \vspace{0.35em}
+
+  \caption{
+    \textbf{Różnorodność biologiczna pomiędzy zbiornikami jest znacząco większa niż wewnątrz zbiorników, oraz różnorodność między rejonami Polski jest większa niż wewnątrz jednego rejonu} 
+    \textbf{a. b. c.} Heatmapa obrazująca beta-różnorodność między próbkami mierzoną przy pomocy odległości Jaccarda (\textbf{a}) Braya-Curtisa (\textbf{b}) i unifrac (\textbf{c}).
+    \textbf{d. f. h.} Sieć obrazująca podobieństwo między próbkami przy pomocy odległości Jaccarda (\textbf{d}, \texttt{min.dist = 0.6}), Braya-Curtisa (\textbf{f}, \texttt{min.dist = 0.8}) i unifrac (\textbf{h}, \texttt{min.dist = 0.4}), pokolorowana po zbiorniku (lewo) i rejonie Polski (prawo)
+    \textbf{e. g. i.} Ordynacja NMDS pokazująca redukcję wymiarowości przestrzeni odległości Jaccarda (\textbf{e}), Braya-Curtisa (\textbf{g}) i unifrac (\textbf{i}), dla próbek (lewo) i gatunków (prawo). Elipsy obrazują rejon Polski, z którego pochodzą próbki.
+    \textbf{j.} Wykresy obrazujące istotność statystyczną różnic pomiędzy poszczególnymi parami zbiorników, oraz ułamek zmienności tłumaczony przez zmienność między daną parą. Statystyki wyliczone przy pomocy korekty Bonferroniego i przy pomocy procedury Benjaminiego-Hochberga.
+  }
+  \label{fig:diversity}
+  \vspace{-1.25em}
+\end{figure*}
+
+Jako pierwszy krok w ocenie różnorodności biologicznej i różnic w różnorodności między próbkami, obliczono alfa-różnorodność -- tj. wewnętrzną różnorodność próbek -- wykorzystując trzy miary różnorodności: obserwowalne bogactwo (ilość OTU w próbce), wskaźnik Shannona (entropia Shannona próbki) oraz wskaźnik Simpsona (Rys. uzup. \ref{fig:diversity_supp}a). Tylko jeden z użytych wskaźników (Shannon: p-value = 0.0122) wskazywał na istnienie istotnych statystycznie różnic w wewnętrznej różnorodności biologicznej między zbiornikami (Observed: p-value = 0.231, Simpson: p-value = 0.062). Żaden ze wskaźników nie wskazywał na istotne statystycznie różnice w wewnętrznej różnorodności biologicznej pomiędzy próbkami z różnych części Polski, czy z różnych pór roku.
+
+Aby potwierdzić hipotezy postawione po eksploracyjnej analizie danych, o większym podobieństwie między próbkami z tego samego zbiornika, analiza alfa-różnorodności jest niewystarczająca. W tym celu przeprowadzono analizę beta-różnorodności, która pozwala na kwantyfikację różnic w różnorodności pomiędzy próbkami. Jako wskaźników beta-różnorodności użyto odległości Jaccarda, która jest miarą podobieństwa pomiędzy skończonymi zbiorami próbek, definiowaną jako wielość przecięcia tych zbiorów podzieloną przez wielkość sumy tych zbiorów:
+
+\begin{equation}
+  J(A, B) = \frac{|A \cap B|}{|A \cup B|},
+\end{equation}
+
+miary różnicy Braya-Curtisa, definiowanej jako:
+
+\begin{equation}
+  BC_{jk} = 1 - \frac{ 2 \displaystyle \sum^{p}_{i=1} \min{(N_{ij} N_{ik})} }{\displaystyle \sum^{p}_{i=1} (N_{ij} + N_{ik}) }
+\end{equation}
+
+gdzie $N_{ij}$ jest liczbą odczytów dla gatunku $i$ w próbce $j$, $N_{ik}$ jest liczbą odczytów dla gatunku $i$ w próbce $k$, a $p$ jest całkowitą liczbą gatunków w obydwu próbkach, oraz odległości unifrac, której definicja jest bardziej skomplikowana, ale co istotne, bierze pod uwagę dystanse filogenetyczne pomiędzy gatunkami obecnymi w próbkach (na podstawie drzewa filogenetycznego). Odległość Jaccarda i unifrac nie biorą pod uwagę ilościowych danych na temat liczby odczytów dla poszczególnych OTU w porównywanych próbkach, podczas gdy miara Braya-Curtisa bierze pod uwagę liczbę odczytów. 
+
+Analiza beta-różnorodności przy pomocy odległości Jaccarada i Unifrac, popiera hipotezę o niższej różnorodności (większym podobieństwie) pomiędzy próbkami z tego samego zbiornika, niż pomiędzy próbkami z różnych zbiorników. Najbardziej klarownie zależność ta jest widoczna w wypadku odległości Jaccarada. Hierarchiczna analiza skupień odległości Jaccarda pomiędzy próbkami, grupuje niemal wszystkie próbki (za wyjątkiem 201\_Zab, która jest zgrupowana z próbkami z Izdebna Nowego) na podstawie zbiornika, z którego pochodzą (Rys. \ref{fig:diversity}a). Ta sama zależność dla odległości Jaccarda jest również wyraźnie widoczna przy wizualizacji odległości jako sieci (\texttt{max.dist = 0.6}) i jako ordynacji, Sieć i ordynacja pokazują również grupowanie próbek na podstawie rejonu Polski z którego pochodzą, ale nie na podstawie pory roku, w czasie której zostały pobrane (Rys. \ref{fig:diversity}d, e).
+
+Miara Braya-Curtisa nie wskazuje wyraźnie na większe podobieństwo wewnątrz zbiorników, ale zdaje się popierać obserwacje o większym podobieństwie próbek z tego samego rejonu Polski. Hierarchiczna analiza skupień wskazuje na podobieństwo próbek z tych samych rejonów Polski, za wyjątkiem 67\_RybM, która grupuje się z próbkami z Mazowsza i 125\_Zab, która grupuje się z próbkami z Kaszub (Rys. \ref{fig:diversity}b). Jest to również widoczne na sieci (\texttt{max.dist = 0.8}), ale mniej wyraźnie niż dla odległości Jaccarda (Rys. \ref{fig:diversity}f)\footnote{Ordynacja dla miary Braya-Curtisa jest z nieznanego mi powodu taka sama jak dla odległości Jaccarda. Niestety nie miałem czasu dokładnie zbadać dlaczego.}.
+
+Powyższe obserwacje o większych różnicach pomiędzy zbiornikami i rejonami Polski są również wyraźne dla analiz przy użyciu odległości unifrac, co wskazuje że różnice te wynikają nie tylko ze składu próbek, ale również z odległości filogenetycznych między OTU w próbkach (Rys. \ref{fig:diversity}c, h, i). 
+
+Analiza podobieństw ANOSIM, także wskazuje na istnienie znacząco większych różnic między zbiornikami niż wewnątrz, oraz między rejonami Polski niż wewnątrz, ale nie pomiędzy porami roku (Rys. uzup. \ref{fig:diversity_supp}d). Należy przy tym pamiętać, że zbiornik pochodzenia próbki i rejon pochodzenia próbki są zmiennymi wzajemnie splątanymi, tj. zbiornik pochodzenia próbki jednoznacznie dyktuje rejon pochodzenia. Sparowana analiza wariancji (paiwise PERMANOVA) również potwierdza istnienie znaczących różnic między zbiornikami (chyba, że użyta zostanie procedura korekcji Bonferroniego dla wielokrotnych testów) (Rys. \ref{fig:diversity}j) oraz między rejonami Polski (adjusted p-value $\leqslant$ 0.001 dla wszystkich miar; Bonferroni i Benjamini-Hochberg).
+
+
+\section{Podsumowanie}
+
+Społeczności autotroficznych euglenin w przebadanej grupie zbiorników wodnych są liczne i różnorodne. Każdy przeanalizowany zbiornik zawierał w sobie znaczącą liczbę gatunków, przynależących do ośmiu głównych rodzajów. Określenie relacji pomiędzy występowaniem konkretnych gatunków w poszczególnych zbiornikach jest trudne, ale ogólniejsza analiza pokazuje, że wszystkie zbiorniki cechują się raczej podobną różnorodnością biologiczną, ponieważ tylko entropia Shannona wskazywała na istotne statystycznie różnie w wewnętrznej różnorodności biologicznej zbiorników. Różnice są jednak wyraźne między zbiornikami -- analiza beta-różnorodności jasno wskazuje na istnienie istotnie większych różnic w składzie gatunkowym autotroficznych euglenin pomiędzy zbiornikami niż wewnątrz zbiorników, oraz na istnienie istotnych różnic pomiędzy rejonami Polski, z których próbki pochodziły. Żadna z użytych metod nie wskazuje natomiast, aby istniały istotne różnie w składzie gatunkowym dyktowane porą roku, w czasie której próbki zostały pobrane -- ot może jednak wynikać, z braku próbek pobranych zimą w zbiorze danych, oraz z faktu, że wszystkie przebadane próbki pochodziły z tego samego roku.
+
+Rejon pochodzenia próbki i zbiornik pochodzenia próbki są zmiennymi wzajemnie splątanymi, dlatego należy zachować ostrożność przy ich wspólnej interpretacji. Niemniej jednak wyniki analizy skupień dla wszystkich miar beta-różnorodności, a także część wyników analizy PERMANOVA, zdaje się wskazywać no większe różnice między rejonami Polski, niż po prostu między zbiornikami. Większa ilość analiz byłaby jednak konieczna aby potwierdzić tą hipotezę.
+
+Dodatkowo, część zmienności wydaje się być tłumaczona przez zmienne ciągłe takie jak zawartość fosforu, azotu, czy pH (Rys. uzup. \ref{fig:diversity_supp}b), na dokładną analizę tych aspektów danych zabrakło jednak czasu.
+
+\section{Dostępność kodu}
+
+
+
+\newpage
+\printbibliography
+
+\newpage
+\newpage
+
+\begin{suppfigure*}[h]
+  \begin{center}
+    \includegraphics[width=0.45\textheight]{figures/all_fastqc_quality_plots.png}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.5em}
+
+  \caption{\textbf{Jakość odczytów na poszczególnych pozycjach dla wszystkich analizowanych próbek}. W lewej kolumnie pokazane są wykresy jakości dla odczytów \textit{forawrd}, a w prawej odpowiadające wykresy jakości odczytów \textit{reverse} dla tej samej próbki.}
+  \label{fig:quality}
+\end{suppfigure*}
+
+
+\begin{suppfigure*}[h]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{figures/per_sequence_content.png}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.5em}
+
+  \caption{\textbf{Częstość poszczególnych nukleotydów na kolejnych pozycjach dla wszystkich próbek}. Duża powtarzalność tych samych sekwencji na początkach odczytów powoduje, że początki sekwencji niosą niską ilość informacji użytecznych w dalszych analizach.}
+  \label{fig:content}
+\end{suppfigure*}
+
+\begin{suppfigure*}[h]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{figures/filtering_stats.png}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.5em}
+
+  \caption{\textbf{Statystyki filtrowania dla różnych kombinacji parametrów}. Wykresy pudełkowe przedstawiające ilości odczytów jakie zostały w próbkach po filtrowaniu, łączeniu i usuwaniu chimerycznych odczytów, dla różnych użytych parametrów filtrowania. Parametry zakodowane są następująco: 220\_200\_15\_15\_10 oznacza przycięcie \textit{forward} do długości 220, \textit{reverse} do długości 200, usunięcie 15 pierwszych zasad z odczytów \textit{forward} i 15 z odczytów \textit{reverse} oraz odrzucenie odczytów o jakości niższej niż 10.}
+  \label{fig:filtering_stats}
+\end{suppfigure*}
+
+\begin{suppfigure*}[h]
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{figures/diversity_supp.pdf}
+  \end{center}
+
+  \hrule width0.5\textwidth \vspace{0.5em}
+
+  \caption{\textbf{}. }
+  \label{fig:diversity_supp}
+\end{suppfigure*}
+
+\end{document}

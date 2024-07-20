@@ -54,12 +54,7 @@ install_analyses_libraries <- function(verbose = FALSE) {
   install_load(cran_packages, verbose = verbose)
 
   # Load qiime2R or install it if it's not already installed.
-  remotes_packages <- c("jbisanz/qiime2R")
-  install_load(
-    remotes_packages,
-    installation_function = function(p) remotes::install_github(p),
-    verbose = verbose
-  )
+  remotes::install_github("jbisanz/qiime2R")
   return(0)
 }
 

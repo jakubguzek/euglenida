@@ -164,14 +164,15 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
     imported_reads_artifact_path = output_dir / "reads.qza"
 
     logger.debug("Setting trimming parameters.")
-    trimming_parameters: List[Tuple[int, int, int, int]] = [
-        parameters
-        for parameters in zip(
-            args.trunc_len_f, args.trunc_len_r, args.trim_left_f, args.trim_left_r
+    trimming_parameters: list[tuple[int, ...]] = list(
+        itertools.product(
+            args.trunc_len_f,
+            args.trunc_len_r,
+            args.trim_left_f,
+            args.trim_left_r,
+            args.trunc_q,
         )
-    ]
-    logger.info(f"Trimming parameter set to: {trimming_parameters}")
-    truncation_parameters: List[int] = args.trunc_q
+    )
 
     # Handle the changing of qiime2 tmp directory. If not done can sometimes lead
     # to errors during runnign qiime2 commands
@@ -191,9 +192,15 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
     )
 
     logger.info(f"Running command: `{utils.command_to_str(import_command)}`")
-    utils.run_command_with_output(import_command, env_with_tmpdir, args, script_name, logger)
-    logger.info(f"Running command: `{utils.command_to_str(demux_summarization_command)}`")
-    utils.run_command_with_output(demux_summarization_command, env_with_tmpdir, args, script_name, logger)
+    utils.run_command_with_output(
+        import_command, env_with_tmpdir, args, script_name, logger
+    )
+    logger.info(
+        f"Running command: `{utils.command_to_str(demux_summarization_command)}`"
+    )
+    utils.run_command_with_output(
+        demux_summarization_command, env_with_tmpdir, args, script_name, logger
+    )
 
     def filter_and_merge(
         trunc_f: int, trunc_r: int, trim_f: int, trim_r: int, trunc_q: int
@@ -231,7 +238,9 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
         )
 
         logger.info(f"Running command: {utils.command_to_str(dada2_command)}")
-        utils.run_command_with_output(dada2_command, env_with_tmpdir, args, script_name, logger)
+        utils.run_command_with_output(
+            dada2_command, env_with_tmpdir, args, script_name, logger
+        )
 
         filtering_stats_command = qiime_metadata_tabulate(
             args.qiime_path,
@@ -245,9 +254,15 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
         )
 
         logger.info(f"Running command: {utils.command_to_str(filtering_stats_command)}")
-        utils.run_command_with_output(filtering_stats_command, env_with_tmpdir, args, script_name, logger)
-        logger.info(f"Running command: {utils.command_to_str(table_visualiztion_command)}")
-        utils.run_command_with_output(table_visualiztion_command, env_with_tmpdir, args, script_name, logger)
+        utils.run_command_with_output(
+            filtering_stats_command, env_with_tmpdir, args, script_name, logger
+        )
+        logger.info(
+            f"Running command: {utils.command_to_str(table_visualiztion_command)}"
+        )
+        utils.run_command_with_output(
+            table_visualiztion_command, env_with_tmpdir, args, script_name, logger
+        )
 
         filtering_table_dir = output_dir / filtering_table_path.stem
         logger.debug(f"Creating filtering table output dir: {filtering_table_dir}")
@@ -258,7 +273,9 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
         )
 
         filtered_sequences_dir = output_dir / filtered_sequences_path.stem
-        logger.debug(f"Creating filtered sequences output dir: {filtered_sequences_dir}")
+        logger.debug(
+            f"Creating filtered sequences output dir: {filtered_sequences_dir}"
+        )
         filtered_sequences_dir.mkdir()
 
         sequences_export_command = qiime_tools_export(
@@ -266,16 +283,27 @@ def preprocess(args: argparse.Namespace, logger: Logger, script_name: str) -> in
         )
 
         logger.info(f"Running command: {utils.command_to_str(table_export_command)}")
-        utils.run_command_with_output(table_export_command, env_with_tmpdir, args, script_name, logger)
-        logger.info(f"Running command: {utils.command_to_str(sequences_export_command)}")
-        utils.run_command_with_output(sequences_export_command, env_with_tmpdir, args, script_name, logger)
+        utils.run_command_with_output(
+            table_export_command, env_with_tmpdir, args, script_name, logger
+        )
+        logger.info(
+            f"Running command: {utils.command_to_str(sequences_export_command)}"
+        )
+        utils.run_command_with_output(
+            sequences_export_command, env_with_tmpdir, args, script_name, logger
+        )
 
-    combinations = list(itertools.product(trimming_parameters, truncation_parameters))
-    logger.info(f"Combinations of trimming and quality-based truncation parameters: {combinations}")
-    logger.info(f"Running filtering and merging for different combinations of parameters.")
-    joblib.Parallel(n_jobs=args.threads)(
-        joblib.delayed(filter_and_merge)(trunc_f, trunc_r, trim_f, trim_r, trunc_q)
-        for (trunc_f, trunc_r, trim_f, trim_r), trunc_q in combinations
+    logger.info(
+        f"Combinations of trimming and quality-based truncation parameters: {trimming_parameters}"
     )
+    logger.info(
+        f"Running filtering and merging for different combinations of parameters."
+    )
+    # joblib.Parallel(n_jobs=args.threads)(
+    #     joblib.delayed(filter_and_merge)(trunc_f, trunc_r, trim_f, trim_r, trunc_q)
+    #     for trunc_f, trunc_r, trim_f, trim_r, trunc_q in trimming_parameters
+    # )
+    for trunc_f, trunc_r, trim_f, trim_r, trunc_q in trimming_parameters:
+        filter_and_merge(trunc_f, trunc_r, trim_f, trim_r, trunc_q)
 
     return 0

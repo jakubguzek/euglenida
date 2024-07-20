@@ -205,34 +205,34 @@ def parse_args() -> argparse.Namespace:
     )
     preprocessing_parser.add_argument(
         "--trunc-len-f",
-        nargs=2,
+        nargs="*",
         type=int,
-        default=[200, 200],
+        default=200,
         help="how long should the forward reads be after trimming them at the ends.",
     )
     preprocessing_parser.add_argument(
         "--trunc-len-r",
-        nargs=2,
+        nargs="*",
         type=int,
-        default=[200, 200],
+        default=200,
         help="how long should the reverse reads be after trimming them at the ends.",
     )
     preprocessing_parser.add_argument(
         "--trim-left-f",
-        nargs=2,
+        nargs="*",
         type=int,
-        default=[10, 10],
+        default=10,
         help="how many nucleotides should be trimmed from the start of forward reads",
     )
     preprocessing_parser.add_argument(
         "--trim-left-r",
-        nargs=2,
+        nargs="*",
         type=int,
-        default=[10, 10],
+        default=10,
         help="how many nucleotides should be trimmed from the start of reverse reads",
     )
     preprocessing_parser.add_argument(
-        "--trunc-q", nargs=2, type=int, default=[15, 15], help="qulity-based truncation"
+        "--trunc-q", nargs="*", type=int, default=15, help="qulity-based truncation"
     )
     preprocessing_parser.add_argument(
         "-t",

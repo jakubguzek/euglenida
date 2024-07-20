@@ -1,0 +1,403 @@
+---
+title: "Downstream analysis"
+author: "Jakub Guzek"
+date: "2024-07-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Downstream analyses
+
+## Setup
+
+Load required libraries
+
+```{r libraries}
+library(dplyr)
+library(RColorBrewer)
+```
+
+Read `.rds` file with saved, filtered phyloseq object
+
+```{r read data}
+phylo <- readRDS("../results/phyloseq/filtered_phyloseq.rds")
+phylo
+```
+
+```{r save useful data into variables}
+otu <- phyloseq::otu_table(phylo)
+meta <- data.frame(phyloseq::sample_data(phylo))
+```
+
+```{r numer of reads}
+reads_n <- phyloseq::sample_sums(phylo)
+meta["Reads"] <- reads_n
+meta
+```
+
+## Rarefaction
+
+### Rarefaction plots
+
+```{r calculate data for plots, fig.width=10, fig.height=5}
+rarecurve_data <- vegan::rarecurve(
+  data.frame(t(otu)),
+  step = 10, label = FALSE, col = meta$Nazwa.zbiornika
+)
+names(rarecurve_data) <- phyloseq::sample_names(phylo)
+```
+
+```{r transform plot data}
+max_length <- max(sapply(rarecurve_data, length))
+rarecurve_data_padded <- lapply(rarecurve_data, function(x) {
+  c(x, rep(NA, max_length - length(x)))
+})
+rarecurve_df <- as.data.frame(do.call(cbind, rarecurve_data))
+rarecurve_df["Subsample"] <- attr(
+  rarecurve_data[[which.max(sapply(rarecurve_data, length))]],
+  "Subsample"
+)
+rarecurve_df_long <- df %>% tidyr::pivot_longer(cols = -Subsample, names_to = "Sample", values_to = "value")
+rarecurve_df_long <- merge(rarecurve_df_long, meta, by.x = "Sample", by.y = "Próbka")
+rarecurve_df_long <- rarecurve_df_long[order(rarecurve_df_long$Subsample), ]
+rarecurve_df_long
+```
+
+```{r rarecurve per zbiornik, fig.width=10, fig.height=6}
+ggplot2::ggplot(rarecurve_df_long) +
+  ggplot2::geom_point(ggplot2::aes(x = Subsample, y = value, color = Nazwa.zbiornika), cex = 0.4) +
+  ggplot2::labs(y = "Liczba OTU", x = "Liczba odczytów") +
+  ggplot2::theme_bw()
+```
+
+```{r rarecurve per sample, fig.width=10, fig.height=6}
+ggplot2::ggplot(rarecurve_df_long) +
+  ggplot2::geom_point(ggplot2::aes(x = Subsample, y = value, color = Sample), cex = 0.4) +
+  ggplot2::labs(y = "Liczba OTU", x = "Liczba odczytów") +
+  ggplot2::theme_bw()
+```
+
+```{r reads per zbiornik, fig.width=10, fig.height=5}
+ggplot2::ggplot(meta) +
+  ggplot2::geom_bar(
+    ggplot2::aes(x = reorder(Próbka, -Reads), y = Reads, fill = Nazwa.zbiornika),
+    stat = "identity"
+  ) +
+  ggplot2::theme_bw()
+```
+
+```{r min nad max of reads}
+print(paste(
+  "Smallest number of reads:", min(reads_n), "in", names(reads_n)[which.min(reads_n)]
+))
+print(paste(
+  "Largest number of reads:", max(reads_n), "in", names(reads_n)[which.max(reads_n)]
+))
+```
+
+### Perform rarefaction
+
+```{r perform rarefaction}
+rarefied_phylo <- phyloseq::rarefy_even_depth(
+  phylo,
+  sample.size = min(reads_n),
+  replace = FALSE,
+  rngseed = 42
+)
+rarefied_phylo <- phyloseq::tax_glom(rarefied_phylo, "Species")
+rarefied_phylo
+```
+
+## Różnorodność filogenetyczna
+
+### Explore diversity with plots
+
+```{r barplot of genera, fig.width=20, fig.height=18, }
+phyloseq::plot_bar(rarefied_phylo, fill = "Genus", x = "Nazwa.zbiornika") +
+  ggplot2::coord_flip() +
+  ggplot2::theme(legend.position = "top") +
+  ggplot2::guides(fill = ggplot2::guide_legend(ncol = 8))
+```
+
+```{r tree, fig.width=12, fig.height=30}
+#png("../report/figures/taxa_composition_tree.png", width = 1200, height = 3000)
+phyloseq::plot_tree(
+  rarefied_phylo,
+  ladderize = "left",
+  label.tips = "Species",
+  text.size = 2,
+  color = "Nazwa.zbiornika",
+  size = "abundance"
+)
+#dev.off()
+```
+
+```{r heatmap of species, fig.width=10, fig.height=12}
+phyloseq::plot_heatmap(rarefied_phylo, tax.labs = "Species")
+```
+
+### Alfa-różnorodność
+
+```{r boxplot of alpha-div, fig.width=15, fig.height=6}
+phyloseq::plot_richness(
+  rarefied_phylo,
+  measures = c("Observed", "Shannon", "Simpson"),
+  x = "Nazwa.zbiornika",
+  color = "Część.Polski",
+) +
+  ggplot2::geom_boxplot() +
+  ggplot2::theme_bw()
+```
+
+```{r alpha-div}
+diversity <- phyloseq::estimate_richness(rarefied_phylo, measures = c("Observed", "Shannon", "Simpson"))
+diversity
+```
+
+```{r}
+phylogenetic_distance <- picante::pd(
+  t(phyloseq::otu_table(rarefied_phylo)),
+  phyloseq::phy_tree(rarefied_phylo),
+  include.root = FALSE
+)
+phylogenetic_distance
+```
+
+```{r}
+diversity <- cbind(diversity, phylogenetic_distance$PD)
+diversity
+```
+
+```{r}
+cbind(meta, diversity)
+```
+
+```{r}
+summary(aov(Shannon ~ Nazwa.zbiornika, data = cbind(meta, diversity)))
+
+```
+
+### Beta różnorodność
+
+```{r}
+jaccard <- phyloseq::distance(rarefied_phylo, method = "jaccard", binary = TRUE)
+bray <- phyloseq::distance(rarefied_phylo, method = "bray")
+unifrac <- phyloseq::distance(rarefied_phylo, method = "unifrac")
+wunifrac <- phyloseq::distance(rarefied_phylo, method = "wunifrac")
+```
+
+```{r, fig.width=12, fig.height=12}
+distances <- list(
+  "Jaccard" = jaccard, "Bray-Curtis" = bray, "Unifrac" = unifrac
+)
+for (i in seq_along(distances)) {
+  gplots::heatmap.2(
+    as.matrix(distances[[i]]),
+    main = names(distances)[i],
+    density.info = "density",
+    trace = "none",
+    col = rev(brewer.pal(9, "Blues"))
+  )
+}
+```
+
+
+```{r, fig.width=12, fig.height=6}
+get_network <- function(
+    distance,
+    max_distance,
+    distance_name,
+    col1 = "Nazwa.zbiornika",
+    col2 = "Część.Polski"
+) {
+  plot <- phyloseq::plot_network(
+    phyloseq::make_network(rarefied_phylo, max.dist = max_distance, distance = distance, keep.isolates = TRUE),
+    rarefied_phylo,
+    color = col1,
+    shape = "Pora.roku"
+  ) +
+    ggplot2::labs(title = paste(distance_name, "-", col1)) 
+  plot2 <- phyloseq::plot_network(
+    phyloseq::make_network(rarefied_phylo, max.dist = max_distance, distance = distance, keep.isolates = TRUE),
+    rarefied_phylo,
+    color = col2,
+    shape = "Pora.roku"
+  ) +
+    ggplot2::labs(title = paste(distance_name, "-", col2)) 
+  return(gridExtra::grid.arrange(plot, plot2, ncol = 2))
+}
+```
+
+```{r, fig.width=14, fig.height=6}
+get_network(jaccard, 0.6, "Jaccard")
+get_network(bray, 0.8, "Bray")
+get_network(unifrac, 0.4, "Unifrac")
+```
+
+
+```{r, fig.width=12, fig.height=4.5}
+xlim <- c(-1.1, 1.4)
+ylim <- c(-1.3, 1.1)
+ordination_split_plot <- function(
+    object,
+    method = "NMDS",
+    distance = "bray",
+    xlim = NULL,
+    ylim = NULL,
+    margin = 0.1) {
+  if (method != "NMDS") {
+    stop("Methods other than NMDS not supported by this function as of now.")
+  }
+
+  o <- phyloseq::ordinate(object, method = method, distance = distance)
+  if (is.null(o$species) || any(is.na(o$species))) {
+    o$species <- vegan::wascores(o$points, t(phyloseq::otu_table(object)))
+  }
+
+  sample_df <- cbind(o$points, meta)
+  taxa_df <- cbind.data.frame(o$species, phyloseq::tax_table(object))
+
+  if (length(margin) == 2) {
+    lmargin <- margin[1]
+    rmargin <- margin[2]
+    tmargin <- margin[1]
+    bmargin <- margin[2]
+  } else if (length(margin) >= 4) {
+    lmargin <- margin[1]
+    rmargin <- margin[2]
+    tmargin <- margin[3]
+    bmargin <- margin[4]
+  } else {
+    lmargin <- margin
+    rmargin <- margin
+    tmargin <- margin
+    bmargin <- margin
+  }
+
+  if (is.null(xlim)) {
+    xlim <- c(
+      min(sample_df$MDS1, taxa_df$MDS1) - lmargin,
+      max(sample_df$MDS1, taxa_df$MDS1) + rmargin
+    )
+  }
+  if (is.null(ylim)) {
+    ylim <- c(
+      min(sample_df$MDS2, taxa_df$MDS2) - tmargin,
+      max(sample_df$MDS2, taxa_df$MDS2) + bmargin
+    )
+  }
+
+  p1 <- ggplot2::ggplot(sample_df, ggplot2::aes(x = MDS1, y = MDS2)) +
+    ggplot2::geom_point(ggplot2::aes(color = Nazwa.zbiornika, shape = Pora.roku)) +
+    ggplot2::stat_ellipse(ggplot2::aes(col = as.factor(Część.Polski)), linetype = 2) +
+    ggplot2::theme_bw() +
+    ggplot2::labs(x = "NMDS1", y = "NMDS2") +
+    ggplot2::theme(legend.position = "left", legend.justification = c(1, 1), legend.box.just = "left") +
+    ggplot2::scale_y_continuous(limits = ylim) +
+    ggplot2::scale_x_continuous(limits = xlim)
+
+  p2 <- ggplot2::ggplot(taxa_df, ggplot2::aes(x = MDS1, y = MDS2, color = Genus)) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = "NMDS1", y = NULL) +
+    ggplot2::theme_bw() +
+    ggplot2::scale_y_continuous(limits = ylim, labels = NULL) +
+    ggplot2::scale_x_continuous(limits = xlim)
+
+  return(gridExtra::grid.arrange(p1, p2, ncol = 2, top = R.utils::capitalize(distance)))
+}
+```
+
+```{r, fig.width=12, fig.height=4.5}
+ordination_split_plot(rarefied_phylo, distance = "jaccard", margin = c(0.3, 0.15, 0.15, 0.15))
+ordination_split_plot(rarefied_phylo, distance = "bray", margin = c(0.2, 0.1, 0.1, 0.1))
+ordination_split_plot(rarefied_phylo, distance = "unifrac", margin=0.062)
+```
+
+```{r, fig.width=12, fig.height=5}
+phyloseq::plot_ordination(
+  rarefied_phylo,
+  phyloseq::ordinate(rarefied_phylo, method = "NMDS", distance = "unifrac"),
+  color = "Genus",
+  type = "split"
+) + ggplot2::theme_bw()
+```
+
+```{r, fig.width=10, fig.height=10}
+cca <- phyloseq::ordinate(rarefied_phylo, method = "CCA", formula = ~ Azot + Fosfor + pH)
+plot(cca, display = c("sp", "wa", "bp"))
+points(cca, disp = "sites", pch = 21, col = "black", bg = meta$Nazwa.zbiornika, cex = 1.0)
+points(cca, disp = "species", pch = 21, col = "black", bg = "orange", cex = 0.6)
+text(cca, "sites", pos = 3, axis.bp = TRUE, cex = 0.5, col = "aquamarine4")
+```
+
+```{r, fig.width=10, fig.height=10}
+MiscMetabar::ggvenn_pq(rarefied_phylo, fact = "Nazwa.zbiornika") + ggplot2::scale_fill_distiller(palette = "Purples", direction = 1)
+```
+
+
+```{r}
+zbiornik <- phyloseq::get_variable(rarefied_phylo, "Nazwa.zbiornika")
+pora_roku <- phyloseq::get_variable(rarefied_phylo, "Pora.roku")
+część_polski <- phyloseq::get_variable(rarefied_phylo, "Część.Polski")
+distances <- c("Jaccard", "Bray", "Unifrac")
+zmienna <- c("Nazwa.zbiornika", "Pora.roku", "Część.Polski")
+anosim_results <- data.frame(expand.grid(distances, zmienna))
+p <- c()
+r <- c()
+for (zmienna in list(zbiornik, pora_roku, część_polski)) {
+  for (dist in list(jaccard, bray, unifrac)) {
+    a <- vegan::anosim(dist, grouping = zmienna)
+    p <- c(p, a$signif)
+    r <- c(r, a$statistic)
+  }
+}
+anosim_results$r <- r
+anosim_results$signif <- p
+colnames(anosim_results) <- c("distance", "grupa", "R", "signif")
+anosim_results
+```
+
+```{r, fig.width=10, fig.height=10}
+ggplot2::ggplot(anosim_results, ggplot2::aes(x = R, y = signif)) +
+  ggplot2::geom_point(ggplot2::aes(col = grupa)) +
+  # facet_wrap("distance", ncol = 3) +
+  ggrepel::geom_label_repel(ggplot2::aes(label = distance)) +
+  ggplot2::scale_y_continuous(transform = c("reverse")) +
+  ggplot2::theme_bw()
+```
+
+```{r}
+bh_perma.jaccard <- ecole::permanova_pairwise(jaccard, meta$Nazwa.zbiornika, padj = "BH")
+bh_perma.jaccard$distance <- "Jaccard - Bnejamini-Hochberg"
+bh_perma.bray <- ecole::permanova_pairwise(bray, meta$Nazwa.zbiornika, padj = "BH")
+bh_perma.bray$distance <- "Bray - Bnejamini-Hochberg"
+bh_perma.unifrac <- ecole::permanova_pairwise(unifrac, meta$Nazwa.zbiornika, padj = "BH")
+bh_perma.unifrac$distance <- "Unifrac - Bnejamini-Hochberg"
+
+bonferroni_perma.jaccard <- ecole::permanova_pairwise(jaccard, meta$Nazwa.zbiornika, padj = "bonferroni")
+bonferroni_perma.jaccard$distance <- "Jaccard - Bonferroni"
+bonferroni_perma.bray <- ecole::permanova_pairwise(bray, meta$Nazwa.zbiornika, padj = "bonferroni")
+bonferroni_perma.bray$distance <- "Bray - Bonferroni"
+bonferroni_perma.unifrac <- ecole::permanova_pairwise(unifrac, meta$Nazwa.zbiornika, padj = "bonferroni")
+bonferroni_perma.unifrac$distance <- "Unifrac - Bonferroni"
+
+perma <- rbind(
+  bh_perma.jaccard, bh_perma.bray, bh_perma.unifrac,
+  bonferroni_perma.jaccard, bonferroni_perma.bray, bonferroni_perma.unifrac
+)
+perma
+```
+
+```{r, fig.width=4, fig.height=12}
+ggplot2::ggplot(perma, ggplot2::aes(x = R2, y = p.adj)) +
+  ggplot2::geom_point(ggplot2::aes(col = pairs)) +
+  ggplot2::facet_wrap("distance", nrow = 6) +
+  ggplot2::scale_y_continuous(transform = c("reverse")) +
+  ggplot2::theme_bw()
+```
+
+
+
